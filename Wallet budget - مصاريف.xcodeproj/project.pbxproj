@@ -44,7 +44,6 @@
 		52D292842D46665F00F857B5 /* summarycardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D292832D46665F00F857B5 /* summarycardView.swift */; };
 		52D2928A2D4681E700F857B5 /* settinngView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D292892D4681E700F857B5 /* settinngView.swift */; };
 		52D4F6F82E48FD120037958E /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 52D4F6F72E48FD120037958E /* GoogleMobileAds */; };
-		52D4F6FA2E48FDCA0037958E /* Wallet-budget----------Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 52D4F6F92E48FDCA0037958E /* Wallet-budget----------Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -104,7 +103,6 @@
 		52D292812D46662200F857B5 /* monthlyHeaderview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = monthlyHeaderview.swift; sourceTree = "<group>"; };
 		52D292832D46665F00F857B5 /* summarycardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = summarycardView.swift; sourceTree = "<group>"; };
 		52D292892D4681E700F857B5 /* settinngView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = settinngView.swift; sourceTree = "<group>"; };
-		52D4F6F92E48FDCA0037958E /* Wallet-budget----------Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Wallet-budget----------Info.plist"; path = "../../Wallet-budget----------Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,7 +162,6 @@
 		52CEEDA92D46242200FDA5AB /* Wallet budget - مصاريف */ = {
 			isa = PBXGroup;
 			children = (
-				52D4F6F92E48FDCA0037958E /* Wallet-budget----------Info.plist */,
 				520E92AB2D491C2F009313F5 /* FinancialDataModel.xcdatamodeld */,
 				526C49EF2D4A1B71007C9EF1 /* persisstentController.swift */,
 				52CEEDAA2D46242200FDA5AB /* budgetWalletApp.swift */,
@@ -329,7 +326,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				52D4F6FA2E48FDCA0037958E /* Wallet-budget----------Info.plist in Resources */,
 				52CEEDB22D46242400FDA5AB /* Preview Assets.xcassets in Resources */,
 				52CEEDAF2D46242400FDA5AB /* Assets.xcassets in Resources */,
 			);
