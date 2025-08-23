@@ -23,6 +23,7 @@
 		523C35FF2E477ADF001988F7 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C35FE2E477ADF001988F7 /* StringExtensions.swift */; };
 		52650F9A2D4F92B9009DDB4A /* bannerAdView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52650F992D4F92B9009DDB4A /* bannerAdView.swift */; };
 		526C49F02D4A1B71007C9EF1 /* persisstentController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526C49EF2D4A1B71007C9EF1 /* persisstentController.swift */; };
+		52749D042E5883C6002F94B6 /* SubscriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52749D032E5883C6002F94B6 /* SubscriptionView.swift */; };
 		52A26B182D4E2DF500E122D7 /* languageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A26B172D4E2DF500E122D7 /* languageManager.swift */; };
 		52A26B1A2D4E2E5600E122D7 /* settingColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A26B192D4E2E5600E122D7 /* settingColor.swift */; };
 		52AD88232D4CBFC300CCC411 /* mainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52AD88222D4CBFC300CCC411 /* mainViewModel.swift */; };
@@ -78,8 +79,10 @@
 		523637892D4D0F5D007A06F9 /* settingmyapp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = settingmyapp.swift; sourceTree = "<group>"; };
 		5239D4742D464576000E1A7E /* mainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mainView.swift; sourceTree = "<group>"; };
 		523C35FE2E477ADF001988F7 /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
+		524EDEBF2E59BF61005C125A /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Products.storekit; sourceTree = "<group>"; };
 		52650F992D4F92B9009DDB4A /* bannerAdView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = bannerAdView.swift; sourceTree = "<group>"; };
 		526C49EF2D4A1B71007C9EF1 /* persisstentController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = persisstentController.swift; sourceTree = "<group>"; };
+		52749D032E5883C6002F94B6 /* SubscriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionView.swift; sourceTree = "<group>"; };
 		52A26B172D4E2DF500E122D7 /* languageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = languageManager.swift; sourceTree = "<group>"; };
 		52A26B192D4E2E5600E122D7 /* settingColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = settingColor.swift; sourceTree = "<group>"; };
 		52AD88222D4CBFC300CCC411 /* mainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mainViewModel.swift; sourceTree = "<group>"; };
@@ -134,6 +137,7 @@
 		52CEED9E2D46242200FDA5AB = {
 			isa = PBXGroup;
 			children = (
+				524EDEBF2E59BF61005C125A /* Products.storekit */,
 				52C345492E4A5F5200909A6D /* openAd.swift */,
 				523C35FE2E477ADF001988F7 /* StringExtensions.swift */,
 				520792A42D4BAE76007DEE88 /* CategoryEntity+CoreDataClass.swift */,
@@ -187,6 +191,7 @@
 				52A26B172D4E2DF500E122D7 /* languageManager.swift */,
 				52A26B192D4E2E5600E122D7 /* settingColor.swift */,
 				52650F992D4F92B9009DDB4A /* bannerAdView.swift */,
+				52749D032E5883C6002F94B6 /* SubscriptionView.swift */,
 			);
 			path = "Wallet budget - مصاريف";
 			sourceTree = "<group>";
@@ -369,6 +374,7 @@
 				52D2928A2D4681E700F857B5 /* settinngView.swift in Sources */,
 				52CEEDAB2D46242200FDA5AB /* budgetWalletApp.swift in Sources */,
 				52D292822D46662200F857B5 /* monthlyHeaderview.swift in Sources */,
+				52749D042E5883C6002F94B6 /* SubscriptionView.swift in Sources */,
 				52D292802D4665F200F857B5 /* trannsactionView.swift in Sources */,
 				52AD88232D4CBFC300CCC411 /* mainViewModel.swift in Sources */,
 				52A26B182D4E2DF500E122D7 /* languageManager.swift in Sources */,
@@ -539,7 +545,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"Wallet budget - مصاريف/Preview Content\"";
 				DEVELOPMENT_TEAM = M8S29G9Z3W;
 				ENABLE_PREVIEWS = YES;
@@ -575,7 +581,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"Wallet budget - مصاريف/Preview Content\"";
 				DEVELOPMENT_TEAM = M8S29G9Z3W;
 				ENABLE_PREVIEWS = YES;

@@ -288,25 +288,68 @@ class OutcomeViewModel: ObservableObject {
 
 
 
+
+
 struct CategoryCardView: View {
-    // MARK: - Properties
+    // Properties
     let category: Categoryy
     let currencySymbol: String
     let expenses: [Expensee]
     let onEdit: () -> Void
     let onDelete: () -> Void
     let onAddExpense: (Expensee) -> Void
-    @StateObject private var languageManager = LanguageManager.shared
+    let onUpdateExpense: (Expensee) -> Void
+    let onDeleteExpense: (Expensee) -> Void
+    @ObservedObject private var languageManager = LanguageManager.shared
     
-    // MARK: - State
+    // FIXED: Better state management for dialogs
     @State private var isExpanded = false
     @State private var showAddExpenseDialog = false
+    @State private var selectedExpenseForEdit: Expensee?
+    @State private var expenseToDelete: Expensee?
     
-    // MARK: - Computed Properties
+    // FIXED: Color constants
+    private struct CardColors {
+        static let primary = Color(red: 0.9, green: 0.29, blue: 0.1)
+        static let expense = Color(red: 0.83, green: 0.18, blue: 0.18)
+        static let success = Color(red: 0.22, green: 0.56, blue: 0.24)
+        static let text = Color(red: 0.46, green: 0.46, blue: 0.46)
+        static let background = Color(red: 0.98, green: 0.91, blue: 0.91)
+    }
+    
+    // FIXED: Dimension constants
+    private struct Dimensions {
+        static let iconSize: CGFloat = 24
+        static let progressBarWidth: CGFloat = 100
+        static let progressBarHeight: CGFloat = 4
+        static let cardPadding: CGFloat = 16
+        static let cornerRadius: CGFloat = 12
+    }
+    
+    // Computed properties
     private var totalExpenses: Double {
         expenses.reduce(0) { $0 + $1.amount }
     }
     
+    // FIXED: Status color computed property
+    private var statusColor: Color {
+        totalExpenses > category.budgetAmount ? CardColors.expense : CardColors.success
+    }
+    
+    // FIXED: Currency formatting helper
+    private func formatCurrency(_ amount: Double) -> String {
+        return "\(currencySymbol)\(String(format: "%.0f", amount))"
+    }
+    
+    // FIXED: Computed binding for delete alert
+    private var showDeleteAlert: Binding<Bool> {
+        Binding(
+            get: { expenseToDelete != nil },
+            set: { if !$0 { expenseToDelete = nil } }
+        )
+    }
+    
+    // FIXED: Date formatters as computed properties (can be optimized further with @State)
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM dd, yyyy"
@@ -321,7 +364,6 @@ struct CategoryCardView: View {
         return formatter
     }
     
-    // MARK: - Body
     var body: some View {
         VStack(spacing: 0) {
             VStack {
@@ -334,17 +376,17 @@ struct CategoryCardView: View {
                             }
                         }) {
                             Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                                .foregroundColor(Color(red: 0.9, green: 0.29, blue: 0.1))
-                                .frame(width: 24, height: 24)
+                                .foregroundColor(CardColors.primary)
+                                .frame(width: Dimensions.iconSize, height: Dimensions.iconSize)
                         }
                         
                         VStack(alignment: languageManager.isArabic ? .trailing : .leading, spacing: 4) {
                             Text(category.name)
                                 .font(.system(size: 15, weight: .bold))
-                                .foregroundColor(Color(red: 0.83, green: 0.18, blue: 0.18))
+                                .foregroundColor(CardColors.expense)
                             Text(dateFormatter.string(from: category.date))
                                 .font(.caption)
-                                .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                                .foregroundColor(CardColors.text)
                         }
                     }
                     
@@ -352,42 +394,38 @@ struct CategoryCardView: View {
                     
                     // Right side with amount and actions
                     VStack(alignment: .trailing, spacing: 4) {
-                        Text("\(currencySymbol)\(String(format: "%.0f", totalExpenses)) / \(currencySymbol)\(String(format: "%.0f", category.budgetAmount))")
+                        Text("\(formatCurrency(totalExpenses)) / \(formatCurrency(category.budgetAmount))")
                             .font(.system(size: 15, weight: .bold))
-                            .foregroundColor(totalExpenses > category.budgetAmount ?
-                                Color(red: 0.83, green: 0.18, blue: 0.18) :
-                                Color(red: 0.22, green: 0.56, blue: 0.24))
+                            .foregroundColor(statusColor)
                         
                         // Progress Bar
                         GeometryReader { geometry in
                             ZStack(alignment: languageManager.isArabic ? .trailing : .leading) {
                                 Rectangle()
-                                    .frame(width: geometry.size.width, height: 4)
+                                    .frame(width: geometry.size.width, height: Dimensions.progressBarHeight)
                                     .opacity(0.2)
                                     .foregroundColor(.gray)
                                 
                                 Rectangle()
-                                    .frame(width: min(CGFloat(totalExpenses / category.budgetAmount) * geometry.size.width, geometry.size.width), height: 4)
-                                    .foregroundColor(totalExpenses > category.budgetAmount ?
-                                        Color(red: 0.83, green: 0.18, blue: 0.18) :
-                                        Color(red: 0.22, green: 0.56, blue: 0.24))
+                                    .frame(width: min(CGFloat(totalExpenses / category.budgetAmount) * geometry.size.width, geometry.size.width), height: Dimensions.progressBarHeight)
+                                    .foregroundColor(statusColor)
                             }
                             .cornerRadius(2)
                         }
-                        .frame(width: 100, height: 4)
+                        .frame(width: Dimensions.progressBarWidth, height: Dimensions.progressBarHeight)
                         .padding(.vertical, 4)
                         
                         // Action Buttons
                         HStack(spacing: 8) {
                             Button(action: onEdit) {
                                 Image(systemName: "pencil")
-                                    .foregroundColor(Color(red: 0.9, green: 0.29, blue: 0.1))
+                                    .foregroundColor(CardColors.primary)
                                     .frame(width: 20, height: 20)
                             }
                             
                             Button(action: onDelete) {
                                 Image(systemName: "trash")
-                                    .foregroundColor(Color(red: 0.78, green: 0.16, blue: 0.16))
+                                    .foregroundColor(CardColors.expense)
                                     .frame(width: 20, height: 20)
                             }
                             
@@ -395,36 +433,57 @@ struct CategoryCardView: View {
                                 Image(systemName: "plus")
                                     .font(.system(size: 12))
                                     .foregroundColor(.white)
-                                    .frame(width: 24, height: 24)
-                                    .background(Color(red: 0.9, green: 0.29, blue: 0.1))
+                                    .frame(width: Dimensions.iconSize, height: Dimensions.iconSize)
+                                    .background(CardColors.primary)
                                     .clipShape(Circle())
                             }
                         }
                     }
                 }
                 
-                // Expandable Expenses List
-                if !expenses.isEmpty {
+                // Expandable Expenses List with Edit/Delete
+                if !expenses.isEmpty && isExpanded {
                     VStack(spacing: 8) {
-                        if isExpanded {
-                            ForEach(expenses) { expense in
-                                HStack {
-                                    VStack(alignment: languageManager.isArabic ? .trailing : .leading, spacing: 2) {
-                                        Text(expense.description)
-                                            .font(.subheadline)
-                                            .foregroundColor(Color(red: 0.83, green: 0.18, blue: 0.18))
-                                        Text(shortDateFormatter.string(from: expense.date))
-                                            .font(.caption)
-                                            .foregroundColor(Color(red: 0.46, green: 0.46, blue: 0.46))
+                        ForEach(expenses) { expense in
+                            HStack {
+                                VStack(alignment: languageManager.isArabic ? .trailing : .leading, spacing: 2) {
+                                    Text(expense.description)
+                                        .font(.subheadline)
+                                        .foregroundColor(CardColors.expense)
+                                    Text(shortDateFormatter.string(from: expense.date))
+                                        .font(.caption)
+                                        .foregroundColor(CardColors.text)
+                                }
+                                
+                                Spacer()
+                                
+                                Text(formatCurrency(expense.amount))
+                                    .font(.subheadline)
+                                    .foregroundColor(CardColors.expense)
+                                
+                                // FIXED: Expense Action Buttons
+                                HStack(spacing: 4) {
+                                    Button(action: {
+                                        selectedExpenseForEdit = expense
+                                    }) {
+                                        Image(systemName: "pencil.circle.fill")
+                                            .foregroundColor(Color.blue.opacity(0.7))
+                                            .font(.system(size: 18))
                                     }
                                     
-                                    Spacer()
-                                    
-                                    Text("\(currencySymbol)\(String(format: "%.0f", expense.amount))")
-                                        .font(.subheadline)
-                                        .foregroundColor(Color(red: 0.78, green: 0.16, blue: 0.16))
+                                    Button(action: {
+                                        expenseToDelete = expense
+                                    }) {
+                                        Image(systemName: "trash.circle.fill")
+                                            .foregroundColor(Color.red.opacity(0.7))
+                                            .font(.system(size: 18))
+                                    }
                                 }
                             }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.white.opacity(0.5))
+                            .cornerRadius(8)
                         }
                     }
                     .padding(.top, 8)
@@ -432,12 +491,14 @@ struct CategoryCardView: View {
                     .padding(.trailing, languageManager.isArabic ? 32 : 0)
                 }
             }
-            .padding(16)
+            .padding(Dimensions.cardPadding)
         }
-        .background(Color(red: 0.98, green: 0.91, blue: 0.91))
-        .cornerRadius(12)
+        .background(CardColors.background)
+        .cornerRadius(Dimensions.cornerRadius)
         .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
-        .padding(.horizontal, 16)
+        .padding(.horizontal, Dimensions.cardPadding)
+        
+        // FIXED: Add expense dialog
         .sheet(isPresented: $showAddExpenseDialog) {
             AddExpenseDialog(
                 categoryName: category.name,
@@ -449,19 +510,44 @@ struct CategoryCardView: View {
                     categoryId: category.id
                 )
                 onAddExpense(expense)
-                
-                // Automatically expand when an expense is added
                 isExpanded = true
             }
+        }
+        
+        // FIXED: Edit expense dialog with proper item-based binding
+        .sheet(item: $selectedExpenseForEdit) { expense in
+            EditExpenseDialog(
+                expense: expense,
+                categoryName: category.name,
+                currencySymbol: currencySymbol
+            ) { updatedDescription, updatedAmount in
+                var updatedExpense = expense
+                updatedExpense.description = updatedDescription
+                updatedExpense.amount = updatedAmount
+                onUpdateExpense(updatedExpense)
+            }
+        }
+        
+        // FIXED: Delete alert with computed binding
+        .alert(languageManager.localizedString(arabic: "حذف المصروف", english: "Delete Expense"),
+               isPresented: showDeleteAlert) {
+            Button(languageManager.localizedString(arabic: "حذف", english: "Delete"), role: .destructive) {
+                if let expense = expenseToDelete {
+                    onDeleteExpense(expense)
+                }
+            }
+            Button(languageManager.localizedString(arabic: "إلغاء", english: "Cancel"), role: .cancel) {
+                // expenseToDelete will be automatically set to nil by the binding
+            }
+        } message: {
+            Text(languageManager.localizedString(
+                arabic: "هل أنت متأكد أنك تريد حذف هذا المصروف؟",
+                english: "Are you sure you want to delete this expense?"
+            ))
         }
         .environment(\.layoutDirection, languageManager.isArabic ? .rightToLeft : .leftToRight)
     }
 }
-
-
-
-
-
 
 public struct AddCategoryDialog: View {
     @Environment(\.dismiss) private var dismiss
@@ -808,12 +894,12 @@ struct FABB: View {
                 .clipShape(Circle())
                 .shadow(color: .black.opacity(0.3), radius: 6, x: 0, y: 4)
         }
-        .buttonStyle(FABButtonStyle())
+        .buttonStyle(FABButtonStylee()) // FIXED: Using correct style name
         .accessibilityLabel("Add Category")
     }
 }
 
-// Custom Button Style to mimic Android FAB interaction
+
 struct FABButtonStylee: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -823,17 +909,17 @@ struct FABButtonStylee: ButtonStyle {
     }
 }
 
+
+
 struct OutcomeView: View {
     @ObservedObject var viewModel: OutcomeViewModel
     @Binding var selectedCurrency: String
-    @StateObject private var languageManager = LanguageManager.shared
+    @ObservedObject private var languageManager = LanguageManager.shared
     @Environment(\.scenePhase) private var scenePhase
 
     @State private var showAddDialog = false
-    @State private var showEditDialog = false
-    @State private var showAddExpenseDialog = false
-    @State private var selectedCategory: Categoryy?
-    @State private var selectedCategoryForExpense: Categoryy?
+    // FIXED: Use single item-based state for category editing
+    @State private var selectedCategoryForEdit: Categoryy?
     @State private var showDeleteConfirmationDialog = false
     @State private var categoryToDelete: Categoryy?
     @State private var showWrongMonthAlert = false
@@ -876,8 +962,8 @@ struct OutcomeView: View {
                                     currencySymbol: viewModel.currencySymbol,
                                     expenses: viewModel.expenses[category.id] ?? [],
                                     onEdit: {
-                                        selectedCategory = category
-                                        showEditDialog = true
+                                        // FIXED: Direct assignment to trigger sheet
+                                        selectedCategoryForEdit = category
                                     },
                                     onDelete: {
                                         categoryToDelete = category
@@ -885,6 +971,12 @@ struct OutcomeView: View {
                                     },
                                     onAddExpense: { expense in
                                         viewModel.addExpense(expense)
+                                    },
+                                    onUpdateExpense: { expense in
+                                        viewModel.updateExpense(expense)
+                                    },
+                                    onDeleteExpense: { expense in
+                                        viewModel.deleteExpense(expense)
                                     }
                                 )
                             }
@@ -898,8 +990,10 @@ struct OutcomeView: View {
                     Spacer()
                     HStack {
                         Spacer()
-                        FABB(action: { showAddDialog = true })
-                            .padding(16)
+                        FABB(action: {
+                            showAddDialog = true
+                        })
+                        .padding(16)
                     }
                 }
             }
@@ -912,6 +1006,8 @@ struct OutcomeView: View {
         .onAppear {
             viewModel.checkAndUpdateMonth()
         }
+        
+        // Add category dialog
         .sheet(isPresented: $showAddDialog) {
             AddCategoryDialog(
                 currencySymbol: viewModel.currencySymbol
@@ -924,19 +1020,20 @@ struct OutcomeView: View {
                 viewModel.addCategory(newCategory)
             }
         }
-        .sheet(isPresented: $showEditDialog) {
-            if let category = selectedCategory {
-                AddCategoryDialog(
-                    currencySymbol: viewModel.currencySymbol,
-                    initialCategory: category
-                ) { name, amount in
-                    var updatedCategory = category
-                    updatedCategory.name = name
-                    updatedCategory.budgetAmount = amount
-                    viewModel.updateCategory(updatedCategory)
-                }
+        
+        // FIXED: Edit category dialog with item-based binding
+        .sheet(item: $selectedCategoryForEdit) { category in
+            AddCategoryDialog(
+                currencySymbol: viewModel.currencySymbol,
+                initialCategory: category
+            ) { name, amount in
+                var updatedCategory = category
+                updatedCategory.name = name
+                updatedCategory.budgetAmount = amount
+                viewModel.updateCategory(updatedCategory)
             }
         }
+        
         .alert(languageManager.isArabic ? "حذف الفئة" : "Delete Category",
                isPresented: $showDeleteConfirmationDialog) {
             Button(languageManager.isArabic ? "حذف" : "Delete", role: .destructive) {
@@ -963,3 +1060,244 @@ struct OutcomeView: View {
         .environment(\.layoutDirection, languageManager.isArabic ? .rightToLeft : .leftToRight)
     }
 }
+
+
+
+extension OutcomeViewModel {
+    
+    func updateExpense(_ expense: Expensee) {
+        guard isCurrentMonth(expense.date) else {
+            print("Cannot update expense from past/future months")
+            return
+        }
+        
+        guard let categoryEntity = persistenceController.fetchCategories()
+            .first(where: { $0.id == expense.categoryId }),
+              let expenseEntity = persistenceController.fetchExpenses(for: categoryEntity)
+            .first(where: { $0.id == expense.id }) else { return }
+        
+        // Using your existing method signature
+        persistenceController.updateExpense(
+            expense: expenseEntity,
+            description: expense.description,
+            amount: expense.amount
+        )
+        
+        fetchCurrentMonthCategories()
+    }
+    
+    func deleteExpense(_ expense: Expensee) {
+        guard let categoryEntity = persistenceController.fetchCategories()
+            .first(where: { $0.id == expense.categoryId }),
+              let expenseEntity = persistenceController.fetchExpenses(for: categoryEntity)
+            .first(where: { $0.id == expense.id }) else { return }
+        
+        persistenceController.deleteExpense(expenseEntity)
+        fetchCurrentMonthCategories()
+    }
+}
+
+
+
+extension CategoryExpensePersistenceController {
+    // These methods use the correct parameter names to match your existing methods
+    func updateExpenseWithNewSignature(
+        expense: ExpenseEntity,
+        description: String,
+        amount: Double
+    ) {
+        updateExpense(expense: expense, description: description, amount: amount)
+    }
+    
+    func updateCategoryWithNewSignature(
+        category: CategoryEntity,
+        name: String,
+        budgetAmount: Double
+    ) {
+        updateCategory(category: category, name: name, budgetAmount: budgetAmount)
+    }
+    
+    // Add viewContext property for easier access
+    var viewContext: NSManagedObjectContext {
+        return container.viewContext
+    }
+}
+
+struct EditExpenseDialog: View {
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var languageManager = LanguageManager.shared
+    let expense: Expensee
+    let categoryName: String
+    let currencySymbol: String
+    let onSave: (String, Double) -> Void
+    
+    @State private var description: String
+    @State private var amount: String
+    @State private var showDescriptionError = false
+    @State private var showAmountError = false
+    @State private var amountErrorMessage = ""
+    
+    // FIXED: Proper initialization with format control
+    init(expense: Expensee, categoryName: String, currencySymbol: String, onSave: @escaping (String, Double) -> Void) {
+        self.expense = expense
+        self.categoryName = categoryName
+        self.currencySymbol = currencySymbol
+        self.onSave = onSave
+        
+        // FIXED: Initialize with original values, avoid .2f for whole numbers
+        self._description = State(initialValue: expense.description)
+        let formattedAmount = expense.amount.truncatingRemainder(dividingBy: 1) == 0 ?
+            String(format: "%.0f", expense.amount) :
+            String(format: "%.2f", expense.amount)
+        self._amount = State(initialValue: formattedAmount)
+    }
+    
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                // FIXED: Better spacing and layout
+                VStack(spacing: 16) {
+                    // Description Field
+                    VStack(alignment: languageManager.isArabic ? .trailing : .leading, spacing: 8) {
+                        Text(languageManager.localizedString(arabic: "الوصف", english: "Description"))
+                            .font(.headline)
+                            .foregroundColor(showDescriptionError ? .red : .primary)
+                        
+                        TextField(languageManager.localizedString(arabic: "أدخل الوصف", english: "Enter description"), text: $description)
+                            .textFieldStyle(.roundedBorder)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .stroke(showDescriptionError ? Color.red : Color.clear, lineWidth: 1)
+                            )
+                            .onChange(of: description) { _ in
+                                showDescriptionError = description.trimmingCharacters(in: .whitespaces).isEmpty
+                            }
+                        
+                        if showDescriptionError {
+                            Text(languageManager.localizedString(arabic: "الرجاء إدخال وصف", english: "Please enter a description"))
+                                .font(.caption)
+                                .foregroundColor(.red)
+                        }
+                    }
+                    
+                    // Amount Field
+                    VStack(alignment: languageManager.isArabic ? .trailing : .leading, spacing: 8) {
+                        Text(languageManager.localizedString(arabic: "المبلغ", english: "Amount"))
+                            .font(.headline)
+                            .foregroundColor(showAmountError ? .red : .primary)
+                        
+                        HStack {
+                            Text(currencySymbol)
+                                .foregroundColor(.secondary)
+                                .font(.system(size: 16, weight: .medium))
+                            
+                            TextField(languageManager.localizedString(arabic: "أدخل المبلغ", english: "Enter amount"), text: $amount)
+                                .keyboardType(.decimalPad)
+                                .onChange(of: amount) { newValue in
+                                    validateAmount(newValue)
+                                }
+                        }
+                        .padding(12)
+                        .background(Color(.systemGray6))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(showAmountError ? Color.red : Color.clear, lineWidth: 1)
+                        )
+                        .cornerRadius(8)
+                        
+                        if showAmountError {
+                            Text(amountErrorMessage)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                        }
+                    }
+                }
+                .padding(.horizontal)
+                
+                Spacer()
+            }
+            .padding(.top)
+            .navigationTitle(languageManager.localizedString(arabic: "تعديل المصروف", english: "Edit Expense"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(languageManager.localizedString(arabic: "إلغاء", english: "Cancel")) {
+                        dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(languageManager.localizedString(arabic: "حفظ", english: "Save")) {
+                        saveExpense()
+                    }
+                    .disabled(showDescriptionError || showAmountError || description.isEmpty || amount.isEmpty)
+                }
+            }
+        }
+        .environment(\.layoutDirection, languageManager.isArabic ? .rightToLeft : .leftToRight)
+        .presentationDetents([.height(400)]) // FIXED: Increased height
+    }
+    
+    // FIXED: Separated validation logic
+    private func validateAmount(_ newValue: String) {
+        if newValue.isEmpty {
+            showAmountError = true
+            amountErrorMessage = languageManager.localizedString(arabic: "الرجاء إدخال مبلغ", english: "Please enter an amount")
+            return
+        }
+        
+        // Handle both Arabic and English numerals
+        let cleanValue = newValue.replacingOccurrences(of: "٫", with: ".")
+            .replacingOccurrences(of: "٠", with: "0")
+            .replacingOccurrences(of: "١", with: "1")
+            .replacingOccurrences(of: "٢", with: "2")
+            .replacingOccurrences(of: "٣", with: "3")
+            .replacingOccurrences(of: "٤", with: "4")
+            .replacingOccurrences(of: "٥", with: "5")
+            .replacingOccurrences(of: "٦", with: "6")
+            .replacingOccurrences(of: "٧", with: "7")
+            .replacingOccurrences(of: "٨", with: "8")
+            .replacingOccurrences(of: "٩", with: "9")
+        
+        if let value = Double(cleanValue), value > 0 {
+            showAmountError = false
+            amountErrorMessage = ""
+        } else {
+            showAmountError = true
+            amountErrorMessage = languageManager.localizedString(arabic: "يجب أن يكون المبلغ أكبر من صفر", english: "Amount must be greater than zero")
+        }
+    }
+    
+    // FIXED: Improved save logic
+    private func saveExpense() {
+        let trimmedDescription = description.trimmingCharacters(in: .whitespaces)
+        
+        guard !trimmedDescription.isEmpty else {
+            showDescriptionError = true
+            return
+        }
+        
+        let cleanAmount = amount.replacingOccurrences(of: "٫", with: ".")
+            .replacingOccurrences(of: "٠", with: "0")
+            .replacingOccurrences(of: "١", with: "1")
+            .replacingOccurrences(of: "٢", with: "2")
+            .replacingOccurrences(of: "٣", with: "3")
+            .replacingOccurrences(of: "٤", with: "4")
+            .replacingOccurrences(of: "٥", with: "5")
+            .replacingOccurrences(of: "٦", with: "6")
+            .replacingOccurrences(of: "٧", with: "7")
+            .replacingOccurrences(of: "٨", with: "8")
+            .replacingOccurrences(of: "٩", with: "9")
+        
+        guard let amountValue = Double(cleanAmount), amountValue > 0 else {
+            showAmountError = true
+            amountErrorMessage = languageManager.localizedString(arabic: "مبلغ غير صحيح", english: "Invalid amount")
+            return
+        }
+        
+        onSave(trimmedDescription, amountValue)
+        dismiss()
+    }
+}
+
+

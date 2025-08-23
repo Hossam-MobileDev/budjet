@@ -1,0 +1,109 @@
+{
+  "identifier" : "41749503",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6741729309",
+    "_developerTeamID" : "M8S29G9Z3W",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 777633637.26634598,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21761460",
+      "localizations" : [
+
+      ],
+      "name" : "Premium Features",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "9.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6751409448",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Remove all ads and unlock premium features ",
+              "displayName" : "Premium Monthly",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "إزالة جميع الإعلانات وإلغاء قفل الميزات",
+              "displayName" : "شهري مميز",
+              "locale" : "ar"
+            }
+          ],
+          "productID" : "com.3rabapp.walletbudget.monthly.premium",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Monthly Premium Subscription",
+          "subscriptionGroupID" : "21761460",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

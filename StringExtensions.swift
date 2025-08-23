@@ -33,3 +33,4 @@ extension String {
         return Double(self.convertingArabicNumeralsToWestern())
     }
 }
+
