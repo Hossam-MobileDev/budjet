@@ -73,10 +73,24 @@ struct MainView: View {
             .sheet(isPresented: $showCurrencyPicker) {
                 CurrencyPickerView(selectedCurrency: $selectedCurrency)
             }
-            .onChange(of: selectedCurrency) { newCurrency in
-                mainViewModel.incomeViewModel.updateCurrencySymbol(newCurrency)
-                mainViewModel.outcomeViewModel.updateCurrencySymbol(newCurrency)
-            }
+            .onAppear {
+                        // Load the saved currency when the view appears
+                        selectedCurrency = AppSettings.shared.selectedCurrency
+                        
+                        // Update the view models with the loaded currency
+                        mainViewModel.incomeViewModel.updateCurrencySymbol(selectedCurrency)
+                        mainViewModel.outcomeViewModel.updateCurrencySymbol(selectedCurrency)
+                    }
+                    .onChange(of: selectedCurrency) { newCurrency in
+                        // Save immediately when currency changes
+                        AppSettings.shared.selectedCurrency = newCurrency
+                        mainViewModel.incomeViewModel.updateCurrencySymbol(newCurrency)
+                        mainViewModel.outcomeViewModel.updateCurrencySymbol(newCurrency)
+                    }
+//            .onChange(of: selectedCurrency) { newCurrency in
+//                mainViewModel.incomeViewModel.updateCurrencySymbol(newCurrency)
+//                mainViewModel.outcomeViewModel.updateCurrencySymbol(newCurrency)
+            
             .background(
                 NavigationLink(
                     destination: TransactionHistoryView(
@@ -93,6 +107,8 @@ struct MainView: View {
         .environment(\.layoutDirection, languageManager.isArabic ? .rightToLeft : .leftToRight)
        
     }
+    
+   
 }
     // MARK: - Currency Picker View
     struct CurrencyPickerView: View {
@@ -106,6 +122,7 @@ struct MainView: View {
             "LBP", "TRY", "IQD", "YER", "MAD", "DZD", "TND", "LYD"
         ]
         
+      
         var body: some View {
             NavigationView {
                 ScrollView {
@@ -114,7 +131,6 @@ struct MainView: View {
                             .font(.title2)
                             .fontWeight(.bold)
                             .padding(.horizontal)
-                        
                         ForEach(currencies, id: \.self) { currency in
                             Button(action: {
                                 selectedCurrency = currency
@@ -122,16 +138,44 @@ struct MainView: View {
                                 presentationMode.wrappedValue.dismiss()
                             }) {
                                 HStack {
-                                    Text(currency)
-                                        .font(.body)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(getCurrencyName(currency, isArabic: languageManager.isArabic))
+                                            .font(.body)
+                                        if languageManager.isArabic {
+                                            Text(currency)
+                                                .font(.caption)
+                                                .foregroundColor(.gray)
+                                        }
+                                    }
                                     Spacer()
                                     if selectedCurrency == currency {
                                         Image(systemName: "checkmark")
                                             .foregroundColor(.blue)
                                     }
                                 }
+                                .padding(.vertical, 8)
+                                .padding(.horizontal)
                             }
+                            .foregroundColor(.primary)
                         }
+//
+//                        ForEach(currencies, id: \.self) { currency in
+//                            Button(action: {
+//                                selectedCurrency = currency
+//                                AppSettings.shared.selectedCurrency = currency
+//                                presentationMode.wrappedValue.dismiss()
+//                            }) {
+//                                HStack {
+//                                    Text(currency)
+//                                        .font(.body)
+//                                    Spacer()
+//                                    if selectedCurrency == currency {
+//                                        Image(systemName: "checkmark")
+//                                            .foregroundColor(.blue)
+//                                    }
+//                                }
+//                            }
+//                        }
                     }
                     .padding()
                 }
@@ -157,6 +201,7 @@ struct HomeView: View {
     @State private var showSettings = false
     @StateObject private var languageManager = LanguageManager.shared
     @State private var showUpgrade = false
+    @EnvironmentObject var premiumManager: SubscriptionManager // Add this line
 
     init(
         onShowHistory: @escaping () -> Void,
@@ -174,31 +219,65 @@ struct HomeView: View {
         ScrollView {
             VStack(spacing: 24) {
                 HStack {
+                    Button(action: {
+                                        if !premiumManager.isPremiumUser {
+                                            showUpgrade = true
+                                        }
+                                    }) {
+                                        HStack(spacing: 6) {
+                                            Image(systemName: premiumManager.isPremiumUser ? "checkmark.circle.fill" : "crown.fill")
+                                                .font(.system(size: 16, weight: .bold))
+                                                .foregroundColor(.white)
+                                            
+                                            Text(premiumManager.isPremiumUser ?
+                                                 (languageManager.isArabic ? "أنت مشترك" : "Subscribed") :
+                                                 (languageManager.isArabic ? "ترقية" : "Upgrade")
+                                            )
+                                                .font(.system(size: 14, weight: .bold))
+                                                .foregroundColor(.white)
+                                        }
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 10)
+                                        .background(
+                                            LinearGradient(
+                                                colors: premiumManager.isPremiumUser ?
+                                                    [Color.green, Color.green.opacity(0.8)] :
+                                                    [Color(red: 1.0, green: 0.84, blue: 0.0), Color(red: 1.0, green: 0.65, blue: 0.0)],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
+                                        .cornerRadius(20)
+                                        .shadow(color: (premiumManager.isPremiumUser ? Color.green : Color(red: 1.0, green: 0.84, blue: 0.0)).opacity(0.3), radius: 4, x: 0, y: 2)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                    .disabled(premiumManager.isPremiumUser) // Disable button when subscribed
+                                    
                     // Upgrade Button (Left side)
-                    Button(action: { showUpgrade = true }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "crown.fill")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.white)
-                            
-                            Text(languageManager.isArabic ? "ترقية" : "Upgrade")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.white)
-                        }
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 10)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(red: 1.0, green: 0.84, blue: 0.0), Color(red: 1.0, green: 0.65, blue: 0.0)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .cornerRadius(20)
-                        .shadow(color: Color(red: 1.0, green: 0.84, blue: 0.0).opacity(0.3), radius: 4, x: 0, y: 2)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    
+//                    Button(action: { showUpgrade = true }) {
+//                        HStack(spacing: 6) {
+//                            Image(systemName: "crown.fill")
+//                                .font(.system(size: 16, weight: .bold))
+//                                .foregroundColor(.white)
+//                            
+//                            Text(languageManager.isArabic ? "ترقية" : "Upgrade")
+//                                .font(.system(size: 14, weight: .bold))
+//                                .foregroundColor(.white)
+//                        }
+//                        .padding(.horizontal, 14)
+//                        .padding(.vertical, 10)
+//                        .background(
+//                            LinearGradient(
+//                                colors: [Color(red: 1.0, green: 0.84, blue: 0.0), Color(red: 1.0, green: 0.65, blue: 0.0)],
+//                                startPoint: .topLeading,
+//                                endPoint: .bottomTrailing
+//                            )
+//                        )
+//                        .cornerRadius(20)
+//                        .shadow(color: Color(red: 1.0, green: 0.84, blue: 0.0).opacity(0.3), radius: 4, x: 0, y: 2)
+//                    }
+//                    .buttonStyle(PlainButtonStyle())
+//                    
                     Spacer()
                     
                     HStack(spacing: 12) {
@@ -372,11 +451,12 @@ struct HomeView: View {
                 }
                 .padding(.horizontal)
                 
-                // Change Currency Button
                 Button(action: {
                     showCurrencyPicker = true
                 }) {
-                    Text(languageManager.isArabic ? "تغيير العملة" : "Change Currency")
+                    Text(languageManager.isArabic ?
+                         "تغيير العملة (\(getCurrencyName(selectedCurrency, isArabic: true)))" :
+                         "Change Currency (\(selectedCurrency))")
                         .foregroundColor(.blue)
                         .underline()
                 }
@@ -567,3 +647,28 @@ struct HomeView: View {
         }
     }
 
+private func getCurrencyName(_ code: String, isArabic: Bool) -> String {
+    if !isArabic {
+        return code
+    }
+    
+    let arabicCurrencies: [String: String] = [
+        "USD": "دولار أمريكي",
+        "EUR": "يورو",
+        "GBP": "جنيه إسترليني",
+        "SAR": "ريال سعودي",
+        "AED": "درهم إماراتي",
+        "JPY": "ين ياباني",
+        "KWD": "دينار كويتي",
+        "BHD": "دينار بحريني",
+        "OMR": "ريال عماني",
+        "QAR": "ريال قطري",
+        "CAD": "دولار كندي",
+        "AUD": "دولار أسترالي",
+        "EGP": "جنيه مصري",
+        "JOD": "دينار أردني",
+        "TRY": "ليرة تركية"
+    ]
+    
+    return arabicCurrencies[code] ?? code
+}

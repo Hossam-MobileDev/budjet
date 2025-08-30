@@ -290,7 +290,7 @@ struct IncomeCard: View {
     }
     
     private var amountView: some View {
-        Text("\(currencySymbol)\(String(format: "%.0f", amount))")
+        Text("\(currencySymbol) \(String(format: "%.0f", amount))")
             .font(.headline)
             .foregroundColor(.white)
     }

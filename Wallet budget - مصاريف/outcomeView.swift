@@ -338,8 +338,10 @@ struct CategoryCardView: View {
     
     // FIXED: Currency formatting helper
     private func formatCurrency(_ amount: Double) -> String {
-        return "\(currencySymbol)\(String(format: "%.0f", amount))"
+        return "\(currencySymbol) \(String(format: "%.0f", amount))"
     }
+    
+  
     
     // FIXED: Computed binding for delete alert
     private var showDeleteAlert: Binding<Bool> {

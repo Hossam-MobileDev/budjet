@@ -355,210 +355,131 @@ struct SubscriptionView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 30) {
-                    // Header
-                    VStack(spacing: 16) {
-                        Image(systemName: "crown.fill")
-                            .font(.system(size: 60))
-                            .foregroundColor(.yellow)
-                        
-                        Text(languageManager.localizedString(
-                            arabic: "احصل على النسخة المميزة",
-                            english: "Go Premium"
-                        ))
-                        .font(languageManager.isArabic ? .custom("AlmaraiBold", size: 28) : .largeTitle)
-                        .fontWeight(.bold)
-                        
-                        Text(languageManager.localizedString(
-                            arabic: "إزالة الإعلانات وفتح المميزات الحصرية",
-                            english: "Remove ads and unlock premium features"
-                        ))
-                        .font(languageManager.isArabic ? .custom("Almarai", size: 18) : .headline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                    }
-                    .padding(.top, 20)
+            VStack(spacing: 20) {
+                // Header - With image only
+                VStack(spacing: 16) {
+                    Image(systemName: "crown.fill")
+                        .font(.system(size: 50))
+                        .foregroundColor(.yellow)
                     
-                    // Benefits
-                    VStack(spacing: 20) {
-                        BenefitRow(
-                            icon: "xmark.circle.fill",
-                            title: languageManager.localizedString(
-                                arabic: "إزالة جميع الإعلانات",
-                                english: "Remove All Ads"
-                            ),
-                            description: languageManager.localizedString(
-                                arabic: "استمتع بتجربة بدون انقطاع",
-                                english: "Enjoy uninterrupted experience"
-                            )
+                    Text(languageManager.localizedString(
+                        arabic: "إزالة الإعلانات وفتح المميزات الحصرية",
+                        english: "Remove ads and unlock premium features"
+                    ))
+                    .font(languageManager.isArabic ? .custom("Almarai", size: 16) : .subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                }
+                .padding(.top, 20)
+                
+                // Benefits - Only Remove Ads
+                VStack(spacing: 16) {
+                    BenefitRow(
+                        icon: "xmark.circle.fill",
+                        title: languageManager.localizedString(
+                            arabic: "إزالة جميع الإعلانات",
+                            english: "Remove All Ads"
+                        ),
+                        description: languageManager.localizedString(
+                            arabic: "استمتع بتجربة بدون انقطاع",
+                            english: "Enjoy uninterrupted experience"
                         )
-                        
-                        BenefitRow(
-                            icon: "bolt.fill",
-                            title: languageManager.localizedString(
-                                arabic: "المميزات الحصرية",
-                                english: "Premium Features"
-                            ),
-                            description: languageManager.localizedString(
-                                arabic: "الوصول للوظائف الحصرية",
-                                english: "Access exclusive functionality"
-                            )
-                        )
-                        
-                        BenefitRow(
-                            icon: "arrow.clockwise",
-                            title: languageManager.localizedString(
-                                arabic: "دعم أولوية",
-                                english: "Priority Support"
-                            ),
-                            description: languageManager.localizedString(
-                                arabic: "احصل على المساعدة عند الحاجة",
-                                english: "Get help when you need it"
-                            )
-                        )
-                        
-                        BenefitRow(
-                            icon: "icloud.fill",
-                            title: languageManager.localizedString(
-                                arabic: "مزامنة سحابية",
-                                english: "Cloud Sync"
-                            ),
-                            description: languageManager.localizedString(
-                                arabic: "مزامنة عبر جميع أجهزتك",
-                                english: "Sync across all your devices"
-                            )
-                        )
-                    }
-                    .padding(.horizontal)
-                    
-                    // Subscription Plan
-                    VStack(spacing: 16) {
-                        Text(languageManager.localizedString(
-                            arabic: "اختر خطتك",
-                            english: "Choose Your Plan"
-                        ))
-                        .font(languageManager.isArabic ? .custom("AlmaraiBold", size: 20) : .title2)
-                        .fontWeight(.semibold)
-                        
-                        // Monthly Plan Card
-                        Button(action: subscribeToPremium) {
-                            HStack {
-                                VStack(alignment: languageManager.isArabic ? .trailing : .leading, spacing: 4) {
-                                    Text(languageManager.localizedString(
-                                        arabic: "الاشتراك الشهري المميز",
-                                        english: "Monthly Premium"
-                                    ))
-                                    .font(languageManager.isArabic ? .custom("AlmaraiBold", size: 16) : .headline)
-                                    .fontWeight(.semibold)
-                                    
-                                    Text(languageManager.localizedString(
-                                        arabic: "يمكن الإلغاء في أي وقت",
-                                        english: "Cancel anytime"
-                                    ))
-                                    .font(languageManager.isArabic ? .custom("Almarai", size: 12) : .caption)
-                                    .foregroundColor(.secondary)
-                                }
-                                
-                                Spacer()
-                                
-                                VStack(alignment: languageManager.isArabic ? .leading : .trailing, spacing: 4) {
-                                    Text("$9.99")
-                                        .font(.title2)
-                                        .fontWeight(.bold)
-                                    
-                                    Text(languageManager.localizedString(
-                                        arabic: "شهرياً",
-                                        english: "per month"
-                                    ))
-                                    .font(languageManager.isArabic ? .custom("Almarai", size: 12) : .caption)
-                                    .foregroundColor(.secondary)
-                                }
-                            }
-                            .padding(20)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .fill(Color.blue.opacity(0.1))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .stroke(Color.blue, lineWidth: 2)
-                                    )
-                            )
-                            .foregroundColor(.primary)
-                        }
-                        .disabled(isLoading)
-                        
-                        // Subscribe Button
-                        Button(action: subscribeToPremium) {
-                            HStack {
-                                if isLoading {
-                                    ProgressView()
-                                        .scaleEffect(0.8)
-                                        .foregroundColor(.white)
-                                }
-                                
-                                Text(isLoading ?
-                                    languageManager.localizedString(
-                                        arabic: "جاري المعالجة...",
-                                        english: "Processing..."
-                                    ) :
-                                    languageManager.localizedString(
-                                        arabic: "اشترك الآن",
-                                        english: "Subscribe Now"
-                                    )
-                                )
-                                .font(languageManager.isArabic ? .custom("AlmaraiBold", size: 16) : .body)
-                                .fontWeight(.semibold)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(12)
-                        }
-                        .disabled(isLoading)
-                        
-                        // Billing info
-                        Text(languageManager.localizedString(
-                            arabic: "يتم الخصم شهرياً بقيمة $9.99",
-                            english: "Billed monthly at $9.99"
-                        ))
-                        .font(languageManager.isArabic ? .custom("Almarai", size: 12) : .caption)
-                        .foregroundColor(.secondary)
-                    }
-                    .padding(.horizontal)
-                    
-                    // Terms and Privacy
-                    VStack(spacing: 8) {
-                        Text(languageManager.localizedString(
-                            arabic: "بالاشتراك، أنت توافق على",
-                            english: "By subscribing, you agree to our"
-                        ))
-                        .font(languageManager.isArabic ? .custom("Almarai", size: 12) : .caption)
-                        .foregroundColor(.secondary)
-                        
-                        HStack(spacing: 16) {
-                            Button(languageManager.localizedString(
-                                arabic: "شروط الخدمة",
-                                english: "Terms of Service"
-                            )) {
-                                // Handle terms action
-                            }
-                            .font(languageManager.isArabic ? .custom("Almarai", size: 12) : .caption)
-                            
-                            Button(languageManager.localizedString(
-                                arabic: "سياسة الخصوصية",
-                                english: "Privacy Policy"
-                            )) {
-                                // Handle privacy action
-                            }
-                            .font(languageManager.isArabic ? .custom("Almarai", size: 12) : .caption)
-                        }
-                    }
-                    .padding(.bottom, 30)
+                    )
                 }
                 .padding(.horizontal)
+                
+                Spacer()
+                
+                // Subscription Plan - Bottom section
+                VStack(spacing: 20) {
+                    Text(languageManager.localizedString(
+                        arabic: "اختر خطتك",
+                        english: "Choose Your Plan"
+                    ))
+                    .font(languageManager.isArabic ? .custom("AlmaraiBold", size: 18) : .title3)
+                    .fontWeight(.semibold)
+                    
+                    // Monthly Plan Card
+                    Button(action: subscribeToPremium) {
+                        HStack {
+                            VStack(alignment: languageManager.isArabic ? .trailing : .leading, spacing: 4) {
+                                Text(languageManager.localizedString(
+                                    arabic: "الاشتراك الشهري المميز",
+                                    english: "Monthly Premium"
+                                ))
+                                .font(languageManager.isArabic ? .custom("AlmaraiBold", size: 14) : .subheadline)
+                                .fontWeight(.semibold)
+                                
+                                Text(languageManager.localizedString(
+                                    arabic: "يمكن الإلغاء في أي وقت",
+                                    english: "Cancel anytime"
+                                ))
+                                .font(languageManager.isArabic ? .custom("Almarai", size: 11) : .caption2)
+                                .foregroundColor(.secondary)
+                            }
+                            
+                            Spacer()
+                            
+                            VStack(alignment: languageManager.isArabic ? .leading : .trailing, spacing: 4) {
+                                Text("$9.99")
+                                    .font(.title3)
+                                    .fontWeight(.bold)
+                                
+                                Text(languageManager.localizedString(
+                                    arabic: "شهرياً",
+                                    english: "per month"
+                                ))
+                                .font(languageManager.isArabic ? .custom("Almarai", size: 11) : .caption2)
+                                .foregroundColor(.secondary)
+                            }
+                        }
+                        .padding(16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.blue.opacity(0.1))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .stroke(Color.blue, lineWidth: 2)
+                                )
+                        )
+                        .foregroundColor(.primary)
+                    }
+                    .disabled(isLoading)
+                    
+                    // Subscribe Button
+                    Button(action: subscribeToPremium) {
+                        HStack {
+                            if isLoading {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                    .foregroundColor(.white)
+                            }
+                            
+                            Text(isLoading ?
+                                languageManager.localizedString(
+                                    arabic: "جاري المعالجة...",
+                                    english: "Processing..."
+                                ) :
+                                languageManager.localizedString(
+                                    arabic: "اشترك الآن",
+                                    english: "Subscribe Now"
+                                )
+                            )
+                            .font(languageManager.isArabic ? .custom("AlmaraiBold", size: 16) : .body)
+                            .fontWeight(.semibold)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                    }
+                    .disabled(isLoading)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 30)
             }
+            .padding(.horizontal)
             .navigationTitle(languageManager.localizedString(
                 arabic: "المميز",
                 english: "Premium"
@@ -685,7 +606,7 @@ struct BenefitRow: View {
             Image(systemName: icon)
                 .font(.title2)
                 .foregroundColor(.blue)
-                .frame(width: 30)
+                .frame(width: 28)
             
             VStack(alignment: languageManager.isArabic ? .trailing : .leading, spacing: 4) {
                 Text(title)
@@ -701,7 +622,7 @@ struct BenefitRow: View {
             
             Spacer()
         }
-        .padding()
+        .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(.systemGray6))
