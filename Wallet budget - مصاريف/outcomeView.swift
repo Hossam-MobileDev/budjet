@@ -9,6 +9,7 @@ import SwiftUI
 import CoreData
 import Combine
 
+
 public enum BudgetType {
     case income
     case outcome
@@ -336,9 +337,8 @@ struct CategoryCardView: View {
         totalExpenses > category.budgetAmount ? CardColors.expense : CardColors.success
     }
     
-    // FIXED: Currency formatting helper
     private func formatCurrency(_ amount: Double) -> String {
-        return "\(currencySymbol) \(String(format: "%.0f", amount))"
+        return "\(currencySymbol) \(amount)"  // Remove the String(format: "%.0f", amount)
     }
     
   
@@ -583,7 +583,7 @@ public struct AddCategoryDialog: View {
         
         if let category = initialCategory {
             _categoryName = State(initialValue: category.name)
-            _budgetAmount = State(initialValue: String(format: "%.2f", category.budgetAmount))
+            _budgetAmount = State(initialValue: String(category.budgetAmount))  // Remove format: "%.2f"
         }
     }
     
@@ -639,7 +639,7 @@ public struct AddCategoryDialog: View {
                             Text(currencySymbol)
                                 .foregroundColor(.gray)
                             TextField(languageManager.localizedString(arabic: "مبلغ الميزانية", english: "Budget Amount"), text: $budgetAmount)
-                                .keyboardType(.numbersAndPunctuation) // CHANGED from .decimalPad
+                                .keyboardType(.decimalPad) // CHANGED from .decimalPad
                                 .onChange(of: budgetAmount) { newValue in
                                     // UPDATED VALIDATION WITH ARABIC NUMERALS SUPPORT
                                     if newValue.isEmpty {
@@ -774,7 +774,7 @@ struct AddExpenseDialog: View {
                             Text(currencySymbol)
                                 .foregroundColor(.gray)
                             TextField("", text: $amount)
-                                .keyboardType(.numbersAndPunctuation) // CHANGED from .decimalPad
+                                .keyboardType(.decimalPad) // CHANGED from .decimalPad
                                 .onChange(of: amount) { newValue in
                                     // UPDATED VALIDATION WITH ARABIC NUMERALS SUPPORT
                                     if newValue.isEmpty {
@@ -1151,7 +1151,7 @@ struct EditExpenseDialog: View {
         let formattedAmount = expense.amount.truncatingRemainder(dividingBy: 1) == 0 ?
             String(format: "%.0f", expense.amount) :
             String(format: "%.2f", expense.amount)
-        self._amount = State(initialValue: formattedAmount)
+        self._amount = State(initialValue: String(expense.amount))  // Remove the formatting logic
     }
     
     var body: some View {
@@ -1301,5 +1301,3 @@ struct EditExpenseDialog: View {
         dismiss()
     }
 }
-
-

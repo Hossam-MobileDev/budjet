@@ -9,6 +9,8 @@ import SwiftUI
 
 // MARK: - Transaction Card View
 
+
+
 struct FinancialIncome: Identifiable {
     let id: UUID
     let amount: Double
@@ -244,10 +246,7 @@ class IncomeViewModel: ObservableObject {
         return getIncomesForMonth(year: year, month: month)
             .reduce(0) { $0 + $1.amount }
     }
-
 }
-
-
 
 // MARK: - Income Card View
 struct IncomeCard: View {
@@ -290,7 +289,7 @@ struct IncomeCard: View {
     }
     
     private var amountView: some View {
-        Text("\(currencySymbol) \(String(format: "%.0f", amount))")
+        Text("\(currencySymbol) \(formatAmountWithoutRounding(amount))")
             .font(.headline)
             .foregroundColor(.white)
     }
@@ -322,203 +321,24 @@ struct IncomeCard: View {
                 .frame(width: 20, height: 20)
         }
     }
+    
+    // Function to format amount without rounding
+    private func formatAmountWithoutRounding(_ amount: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 10 // Allow up to 10 decimal places
+        formatter.groupingSeparator = ","
+        formatter.usesGroupingSeparator = true
+        
+        // Remove trailing zeros
+        let formattedString = formatter.string(from: NSNumber(value: amount)) ?? "0"
+        return formattedString
+    }
 }
 
-
-
-
-
-//struct AddIncomeDialog: View {
-//    let viewModel: IncomeViewModel  // Remove @ObservedObject - just use let
-//    @Binding var isPresented: Bool
-//    let currencySymbol: String
-//    var initialIncome: FinancialIncome?
-//    @StateObject private var languageManager = LanguageManager.shared
-//    
-//    @State private var incomeName: String
-//    @State private var incomeAmount: String
-//    @State private var showNameError: Bool = false
-//    @State private var showAmountError: Bool = false
-//    @State private var amountErrorMessage: String = ""
-//    
-//    init(viewModel: IncomeViewModel,
-//         isPresented: Binding<Bool>,
-//         currencySymbol: String,
-//         initialIncome: FinancialIncome? = nil) {
-//        self.viewModel = viewModel
-//        self._isPresented = isPresented
-//        self.currencySymbol = currencySymbol
-//        self.initialIncome = initialIncome
-//        
-//        // Initialize @State properties properly
-//        if let income = initialIncome {
-//            self._incomeName = State(initialValue: income.description)
-//            self._incomeAmount = State(initialValue: String(format: "%.2f", income.amount))
-//        } else {
-//            self._incomeName = State(initialValue: "")
-//            self._incomeAmount = State(initialValue: "")
-//        }
-//    }
-//    
-//    var body: some View {
-//        NavigationView {
-//            VStack(spacing: 16) {
-//                // Income Name TextField
-//                VStack(alignment: languageManager.isArabic ? .trailing : .leading, spacing: 4) {
-//                    HStack {
-//                        if !languageManager.isArabic {
-//                            nameTextField
-//                        } else {
-//                            Spacer()
-//                            nameTextField
-//                        }
-//                    }
-//                    
-//                    if showNameError {
-//                        errorText(languageManager.isArabic ? "الرجاء إدخال اسم الدخل" : "Please enter income name")
-//                    }
-//                }
-//                
-//                // Amount TextField
-//                VStack(alignment: languageManager.isArabic ? .trailing : .leading, spacing: 4) {
-//                    HStack {
-//                        if !languageManager.isArabic {
-//                            Text(currencySymbol)
-//                                .foregroundColor(.gray)
-//                            amountTextField
-//                        } else {
-//                            amountTextField
-//                            Text(currencySymbol)
-//                                .foregroundColor(.gray)
-//                        }
-//                    }
-//                    .textFieldStyle(RoundedBorderTextFieldStyle())
-//                    
-//                    if showAmountError {
-//                        errorText(amountErrorMessage)
-//                    }
-//                }
-//                
-//                Spacer()
-//            }
-//            .padding()
-//            .navigationTitle(initialIncome == nil ?
-//                           (languageManager.isArabic ? "إضافة دخل" : "Add Income") :
-//                           (languageManager.isArabic ? "تعديل الدخل" : "Edit Income"))
-//            .navigationBarTitleDisplayMode(.inline)
-//            .toolbar {
-//                ToolbarItem(placement: .cancellationAction) {
-//                    Button(languageManager.isArabic ? "إلغاء" : "Cancel") {
-//                        isPresented = false
-//                    }
-//                }
-//                
-//                ToolbarItem(placement: .confirmationAction) {
-//                    saveButton
-//                }
-//            }
-//        }
-//        .environment(\.layoutDirection, languageManager.isArabic ? .rightToLeft : .leftToRight)
-//    }
-//    
-//    private var nameTextField: some View {
-//        TextField(languageManager.isArabic ? "اسم الدخل" : "Income Name", text: $incomeName)
-//            .textFieldStyle(RoundedBorderTextFieldStyle())
-//            .onChange(of: incomeName) { _ in
-//                showNameError = false
-//            }
-//            .multilineTextAlignment(languageManager.isArabic ? .trailing : .leading)
-//    }
-//    
-//    private var amountTextField: some View {
-//        TextField(languageManager.isArabic ? "المبلغ" : "Amount", text: $incomeAmount)
-//            .keyboardType(.numbersAndPunctuation)
-//            .onChange(of: incomeAmount) { newValue in
-//                validateAmount(newValue)
-//            }
-//            .multilineTextAlignment(languageManager.isArabic ? .trailing : .leading)
-//    }
-//    
-//    private func validateAmount(_ newValue: String) {
-//        if newValue.isEmpty {
-//            showAmountError = true
-//            amountErrorMessage = languageManager.isArabic ? "الرجاء إدخال المبلغ" : "Please enter amount"
-//        } else if newValue.isValidNumber {
-//            showAmountError = false
-//            amountErrorMessage = ""
-//        } else {
-//            showAmountError = true
-//            amountErrorMessage = languageManager.isArabic ? "يرجى إدخال رقم صحيح" : "Please enter a valid number"
-//        }
-//    }
-//    
-//    private func errorText(_ text: String) -> some View {
-//        Text(text)
-//            .font(.caption)
-//            .foregroundColor(.red)
-//            .frame(maxWidth: .infinity, alignment: languageManager.isArabic ? .trailing : .leading)
-//    }
-//    
-//    private var saveButton: some View {
-//        Button(initialIncome == nil ?
-//              (languageManager.isArabic ? "إضافة" : "Add") :
-//              (languageManager.isArabic ? "حفظ" : "Save")) {
-//            validateAndSave()
-//        }
-//        .disabled(incomeName.isEmpty || incomeAmount.isEmpty || showAmountError)
-//    }
-//    
-//    private func validateAndSave() {
-//        showNameError = incomeName.isEmpty
-//        
-//        if incomeAmount.isEmpty {
-//            showAmountError = true
-//            amountErrorMessage = languageManager.isArabic ? "الرجاء إدخال المبلغ" : "Please enter amount"
-//        } else if !incomeAmount.isValidNumber {
-//            showAmountError = true
-//            amountErrorMessage = languageManager.isArabic ? "يرجى إدخال رقم صحيح" : "Please enter a valid number"
-//        } else if let amount = incomeAmount.doubleValue, amount <= 0 {
-//            showAmountError = true
-//            amountErrorMessage = languageManager.isArabic ? "يجب أن يكون المبلغ أكبر من صفر" : "Amount must be greater than zero"
-//        } else {
-//            showAmountError = false
-//            amountErrorMessage = ""
-//        }
-//        
-//        guard let amount = incomeAmount.doubleValue,
-//              !incomeName.isEmpty,
-//              !showAmountError else {
-//            return
-//        }
-//        
-//        if let existingIncome = initialIncome {
-//            let updatedIncome = FinancialIncome(
-//                id: existingIncome.id,
-//                amount: amount,
-//                date: existingIncome.date,
-//                description: incomeName
-//            )
-//            viewModel.updateIncome(updatedIncome)
-//        } else {
-//            let newIncome = FinancialIncome(
-//                amount: amount,
-//                date: Date(),
-//                description: incomeName
-//            )
-//            viewModel.addIncome(newIncome)
-//        }
-//        
-//        // Force refresh the view model data
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-//            viewModel.checkAndUpdateMonth()
-//        }
-//        
-//        isPresented = false
-//    }
-//}
-
 struct AddIncomeDialog: View {
-    let viewModel: IncomeViewModel  // Changed from @ObservedObject to let
+    let viewModel: IncomeViewModel
     @Binding var isPresented: Bool
     let currencySymbol: String
     var initialIncome: FinancialIncome?
@@ -539,14 +359,27 @@ struct AddIncomeDialog: View {
         self.currencySymbol = currencySymbol
         self.initialIncome = initialIncome
         
-        // Initialize @State properties properly
+        // Initialize @State properties without rounding
         if let income = initialIncome {
             self._incomeName = State(initialValue: income.description)
-            self._incomeAmount = State(initialValue: String(format: "%.0f", income.amount))
+            // Don't round the amount when editing
+            self._incomeAmount = State(initialValue: Self.formatAmountForEditing(income.amount))
         } else {
             self._incomeName = State(initialValue: "")
             self._incomeAmount = State(initialValue: "")
         }
+    }
+    
+    // Helper function to format amount for editing without rounding
+    static private func formatAmountForEditing(_ amount: Double) -> String {
+        // Remove trailing zeros but keep decimal places if needed
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 10
+        formatter.usesGroupingSeparator = false // Don't use separators in edit field
+        
+        return formatter.string(from: NSNumber(value: amount)) ?? "0"
     }
     
     var body: some View {
@@ -621,7 +454,7 @@ struct AddIncomeDialog: View {
     
     private var amountTextField: some View {
         TextField(languageManager.isArabic ? "المبلغ" : "Amount", text: $incomeAmount)
-            .keyboardType(.numbersAndPunctuation)
+            .keyboardType(.decimalPad)
             .onChange(of: incomeAmount) { newValue in
                 validateAmount(newValue)
             }
@@ -832,8 +665,7 @@ struct IncomeView: View {
                     viewModel: viewModel,
                     isPresented: $showAddDialog,
                     currencySymbol: viewModel.currencySymbol,
-                    initialIncome: selectedIncome  // Just pass the entire income object
-
+                    initialIncome: selectedIncome
                 )
             } else {
                 // Add mode
@@ -861,6 +693,8 @@ struct IncomeView: View {
         return formatter.string(from: date)
     }
 }
+
+// Updated formatFullNumber function to not round
 func formatFullNumber(_ number: Double) -> String {
     // Handle edge cases
     if number.isNaN || number.isInfinite {
@@ -869,7 +703,8 @@ func formatFullNumber(_ number: Double) -> String {
     
     let formatter = NumberFormatter()
     formatter.numberStyle = .decimal
-    formatter.maximumFractionDigits = 0
+    formatter.minimumFractionDigits = 0
+    formatter.maximumFractionDigits = 10 // Allow up to 10 decimal places instead of 0
     formatter.groupingSeparator = ","
     formatter.usesGroupingSeparator = true
     

@@ -786,54 +786,51 @@ struct SubscriptionView: View {
                     .font(languageManager.isArabic ? .custom("AlmaraiBold", size: 18) : .title3) // Reduced size
                     .fontWeight(.semibold)
                     
-                    // Monthly Plan Card - More compact
-                    Button(action: subscribeToPremium) {
-                        HStack {
-                            VStack(alignment: languageManager.isArabic ? .trailing : .leading, spacing: 4) {
-                                Text(languageManager.localizedString(
-                                    arabic: "الاشتراك الشهري المميز",
-                                    english: "Monthly Premium"
-                                ))
-                                .font(languageManager.isArabic ? .custom("AlmaraiBold", size: 14) : .subheadline) // Reduced size
-                                .fontWeight(.semibold)
-                                
-                                Text(languageManager.localizedString(
-                                    arabic: "يمكن الإلغاء في أي وقت",
-                                    english: "Cancel anytime"
-                                ))
-                                .font(languageManager.isArabic ? .custom("Almarai", size: 11) : .caption2) // Reduced size
-                                .foregroundColor(.secondary)
-                            }
+                    // Monthly Plan Card - Display only (no action)
+                    HStack {
+                        VStack(alignment: languageManager.isArabic ? .trailing : .leading, spacing: 4) {
+                            Text(languageManager.localizedString(
+                                arabic: "الاشتراك الشهري المميز",
+                                english: "Monthly Premium"
+                            ))
+                            .font(languageManager.isArabic ? .custom("AlmaraiBold", size: 14) : .subheadline) // Reduced size
+                            .fontWeight(.semibold)
                             
-                            Spacer()
-                            
-                            VStack(alignment: languageManager.isArabic ? .leading : .trailing, spacing: 4) {
-                                Text("$9.99")
-                                    .font(.title3) // Reduced from title2
-                                    .fontWeight(.bold)
-                                
-                                Text(languageManager.localizedString(
-                                    arabic: "شهرياً",
-                                    english: "per month"
-                                ))
-                                .font(languageManager.isArabic ? .custom("Almarai", size: 11) : .caption2) // Reduced size
-                                .foregroundColor(.secondary)
-                            }
+                            Text(languageManager.localizedString(
+                                arabic: "يمكن الإلغاء في أي وقت",
+                                english: "Cancel anytime"
+                            ))
+                            .font(languageManager.isArabic ? .custom("Almarai", size: 11) : .caption2) // Reduced size
+                            .foregroundColor(.secondary)
                         }
-                        .padding(16) // Reduced padding
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.blue.opacity(0.1))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .stroke(Color.blue, lineWidth: 2)
-                                )
-                        )
-                        .foregroundColor(.primary)
+                        
+                        Spacer()
+                        
+                        VStack(alignment: languageManager.isArabic ? .leading : .trailing, spacing: 4) {
+                            Text("$9.99")
+                                .font(.title3) // Reduced from title2
+                                .fontWeight(.bold)
+                            
+                            Text(languageManager.localizedString(
+                                arabic: "شهرياً",
+                                english: "per month"
+                            ))
+                            .font(languageManager.isArabic ? .custom("Almarai", size: 11) : .caption2) // Reduced size
+                            .foregroundColor(.secondary)
+                        }
                     }
-                    .disabled(isLoading)
+                    .padding(16) // Reduced padding
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.blue.opacity(0.1))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(Color.blue, lineWidth: 2)
+                            )
+                    )
+                    .foregroundColor(.primary)
                     
-                    // Subscribe Button
+                    // Subscribe Button - Only this triggers subscription
                     Button(action: subscribeToPremium) {
                         HStack {
                             if isLoading {
@@ -982,43 +979,9 @@ struct SubscriptionView: View {
     }
 }
 
-// MARK: - BenefitRow Component - Compact version
-struct BenefitRow: View {
-    let icon: String
-    let title: String
-    let description: String
-    @StateObject private var languageManager = LanguageManager.shared
-    
-    var body: some View {
-        HStack(spacing: 12) { // Reduced spacing
-            Image(systemName: icon)
-                .font(.title3) // Reduced from title2
-                .foregroundColor(.blue)
-                .frame(width: 24) // Reduced width
-            
-            VStack(alignment: languageManager.isArabic ? .trailing : .leading, spacing: 2) { // Reduced spacing
-                Text(title)
-                    .font(languageManager.isArabic ? .custom("AlmaraiBold", size: 14) : .subheadline) // Reduced size
-                    .fontWeight(.semibold)
-                    .frame(maxWidth: .infinity, alignment: languageManager.isArabic ? .trailing : .leading)
-                
-                Text(description)
-                    .font(languageManager.isArabic ? .custom("Almarai", size: 12) : .caption) // Reduced size
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, alignment: languageManager.isArabic ? .trailing : .leading)
-            }
-            
-            Spacer()
-        }
-        .padding(12) // Reduced padding
-        .background(
-            RoundedRectangle(cornerRadius: 10) // Reduced corner radius
-                .fill(Color(.systemGray6))
-        )
-    }
-}
 
-// MARK: - SubscriptionManager (unchanged)
+
+// MARK: - SubscriptionManager
 class SubscriptionManager: ObservableObject {
     @Published var isPremiumUser = false
     private let productID = "com.3rabapp.walletbudget.monthly.premium"
@@ -1085,6 +1048,42 @@ class SubscriptionManager: ObservableObject {
         isPremiumUser = isPremium
         UserDefaults.standard.set(isPremium, forKey: "isPremiumUser")
         print("📱 Premium status updated to: \(isPremium)")
+    }
+}
+
+// MARK: - BenefitRow Component - Compact version
+struct BenefitRow: View {
+    let icon: String
+    let title: String
+    let description: String
+    @StateObject private var languageManager = LanguageManager.shared
+    
+    var body: some View {
+        HStack(spacing: 12) { // Reduced spacing
+            Image(systemName: icon)
+                .font(.title3) // Reduced from title2
+                .foregroundColor(.blue)
+                .frame(width: 24) // Reduced width
+            
+            VStack(alignment: languageManager.isArabic ? .trailing : .leading, spacing: 2) { // Reduced spacing
+                Text(title)
+                    .font(languageManager.isArabic ? .custom("AlmaraiBold", size: 14) : .subheadline) // Reduced size
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity, alignment: languageManager.isArabic ? .trailing : .leading)
+                
+                Text(description)
+                    .font(languageManager.isArabic ? .custom("Almarai", size: 12) : .caption) // Reduced size
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: languageManager.isArabic ? .trailing : .leading)
+            }
+            
+            Spacer()
+        }
+        .padding(12) // Reduced padding
+        .background(
+            RoundedRectangle(cornerRadius: 10) // Reduced corner radius
+                .fill(Color(.systemGray6))
+        )
     }
 }
 
