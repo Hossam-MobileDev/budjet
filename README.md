@@ -15,19 +15,6 @@ A comprehensive personal finance management app that helps you track your income
 💳 Multi-Category Support - Support for various expense categories
 📈 Financial Overview - Get a complete overview of your financial health
 
-📸 Screenshots
-Main Dashboard
-<img src="path/to/screenshot1.png" alt="Main Dashboard" width="300">
-Clean and intuitive dashboard showing your financial categories
-Transaction History
-<img src="path/to/screenshot2.png" alt="Transaction History" width="300">
-Detailed transaction history with monthly breakdown and category-wise expenses
-Add Transaction
-<img src="path/to/screenshot3.png" alt="Add Transaction" width="300">
-Easy-to-use interface for adding new transactions with category selection
-Financial Overview
-<img src="path/to/screenshot4.png" alt="Financial Overview" width="300">
-Visual representation of your income vs expenses with recent transaction details
 🌟 Why Choose Wallet Budget?
 
 Simple & Intuitive - Clean Arabic interface that's easy to navigate
